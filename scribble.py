@@ -48,6 +48,56 @@ class Item:
             'desc': self.__desc
         }
 
+# Stats = data container for statistical information about your character, enemies, allies
+class Stats:
+    # private variables
+    __hp = None
+    __str = None
+    __dex = None
+    __con = None
+    __int = None
+    __wis = None
+    __cha = None
+
+    # constructor
+    def __init__(self, hp):
+        self.hp = hp
+
+    # convert class data into dictionary and return
+    def toDict(self):
+        return {
+            'health': self.__hp
+            'strength': self.__str
+            'dexterity': self.__dex
+            'constitution': self.__con
+            'intelligence': self.__int
+            'wisdom': self.__wis
+            'charisma': self.__cha
+        }
+
+# Enemy - their stats, dropped items, equipment, name and description, and optional .PNG photo of enemy for battleboard
+class Enemy:
+    # private variables
+    __name = None
+    __desc = None
+    __stats = None
+
+    # constructor
+    def __init__(self, name, desc, stats):
+        self.__name = name
+        self.__desc = desc
+        self.__stats = stats
+
+    # convert class data into dictionary and return
+    def toDict(self):
+        tempDict = {
+            'name': self.__name
+            'desc': self.__desc
+        }
+
+        tempDict.append(self.__stats.toDict())
+        return tempDict
+
 # public functions
 # saveToJson - takes a dictionary and string as input, saves data to fileName.json
 def saveToJson(info, fileName):
