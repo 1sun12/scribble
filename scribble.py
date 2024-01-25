@@ -2,6 +2,12 @@
 Scribble - a DND information manager to make campaign note taking a little easier and computer-based
 Authors: sun & RogueFyker
 
+Features:
+- DND Dice Rolls from 1 - 20 sided dice
+- manage a personal database of items, enemies, locations, spells, equipment, and more!
+- battleboard feature; visualize your fights with a tiled 2D grid you can place your character, allies, and enemies on
+- tallies how many deaths, beers consumed, and enemies slain during campaign!
+
 Code Format (in order):
 - imports
 - global variables / constants
@@ -25,6 +31,10 @@ class Item:
     # __private variables
     __name = None
     __desc = None
+    __count = None
+    __consumable = None
+    __activeOrPassive = None
+    __key = None
 
     # constructor
     def __init__(self, name, desc):
