@@ -13,11 +13,14 @@ Code Format (in order):
 '''
 import PySimpleGUI as sg # library needed for graphical elements, website: https://www.pysimplegui.org/en/latest/
 import json # library needed for .json parsing and manipulation
+import configparser # library needed to parse the 'config.ini' file located in 'settings'
 
 #global variables / constants
+CONFIG =
 INVENTORY_JSON = 'data-base/inventory.json'
 
 # classes
+# Item - consumables, foods, passive, etc
 class Item:
     # __private variables
     __name = None
@@ -36,11 +39,13 @@ class Item:
         }
 
 # public functions
+# saveToJson - takes a dictionary and string as input, saves data to fileName.json
 def saveToJson(info, fileName):
     with open(fileName, 'w') as jsonFile:
         json.dump(info, jsonFile, indent = 2)
         print(f'Successfully entered info into {fileName}')
 
+# loadJsonFile - returns a dictionary containing all data from .json file
 def loadJsonFile(fileName):
     try:
         with open(fileName, 'r') as jsonFile:
