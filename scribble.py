@@ -16,7 +16,7 @@ import json # library needed for .json parsing and manipulation
 import configparser # library needed to parse the 'config.ini' file located in 'settings'
 
 #global variables / constants
-CONFIG =
+CONFIG = 'settings/config.ini'
 INVENTORY_JSON = 'data-base/inventory.json'
 
 # classes
