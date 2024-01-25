@@ -3,7 +3,7 @@ Scribble - a DND information manager to make campaign note taking a little easie
 Authors: sun & RogueFyker
 
 Features:
-- DND Dice Rolls from 1 - 20 sided dice
+- DND Dice Rolls from 2 - 20 sided dice
 - manage a personal database of items, enemies, locations, spells, equipment, and more!
 - battleboard feature; visualize your fights with a tiled 2D grid you can place your character, allies, and enemies on
 - tallies how many deaths, beers consumed, and enemies slain during campaign!
@@ -61,17 +61,17 @@ class Stats:
 
     # constructor
     def __init__(self, hp):
-        self.hp = hp
+        self.__hp = hp
 
     # convert class data into dictionary and return
     def toDict(self):
         return {
-            'health': self.__hp
-            'strength': self.__str
-            'dexterity': self.__dex
-            'constitution': self.__con
-            'intelligence': self.__int
-            'wisdom': self.__wis
+            'health': self.__hp,
+            'strength': self.__str,
+            'dexterity': self.__dex,
+            'constitution': self.__con,
+            'intelligence': self.__int,
+            'wisdom': self.__wis,
             'charisma': self.__cha
         }
 
@@ -91,7 +91,7 @@ class Enemy:
     # convert class data into dictionary and return
     def toDict(self):
         tempDict = {
-            'name': self.__name
+            'name': self.__name,
             'desc': self.__desc
         }
 
@@ -129,14 +129,25 @@ def makeWindow():
     # set color palette / theme of application
     sg.theme('Topanga')
 
-    # create a 'list' containing elements, the list is later added to the window with elements in it's indexes'
-    layout_inv = [[sg.T(s=20), sg.Text('Add Item')],
-                  [sg.Text('Item Name:'), sg.Input(k = '-Item Name:-')],
-                  [sg.Text('Item Desc:'), sg.Input(k = '-Item Desc:-')],
-                  [sg.Button('Enter')]]
+    # list containing data input elements for items and inventory management
+    layout_inv = [[sg.Text('Add Item')],
+                  [sg.Text('Name:'), sg.Input(k = '-Item Name-')],
+                  [sg.Text('Desc:'), sg.Input(k = '-Item Desc-')]]
+
+    # list containing data input elements for enemy management
+    layout_enemy = [[sg.Text('Enemy')],
+                    [sg.Text('Name:'), sg.Input(k = '-Enemy Name-')],
+                    [sg.Text('Desc:'), sg.Input(k = '-Enemy Desc-')]]
+
+    # list containing button elements for GUI interaction
+    layout_buttons = [[sg.Button('Enter')]]
+
+    # layout containing all previously made layouts
+    layout_final = [[sg.Col(layout_inv, p=0), sg.Col(layout_enemy, p=0)],
+                    [layout_buttons]]
 
     # create a window and add list of elements to window as a parameter in it's constructor
-    return sg.Window('Scribble', layout_inv)
+    return sg.Window('Scribble', layout_final)
 
 # calls makeWindow, application is built and deployed here
 window = makeWindow()
@@ -159,7 +170,7 @@ while True:
     # if 'enter' is pressed, enter item information into 'inventory.json'
     if event == 'Enter':
         # create dictionary of item information
-        item = Item(values['-Item Name:-'], values['-Item Desc:-'])
+        item = Item(values['-Item Name-'], values['-Item Desc-'])
         existingItems = loadJsonFile(INVENTORY_JSON)
         existingItems.append(item.toDict())
         saveToJson(existingItems, INVENTORY_JSON)
