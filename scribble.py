@@ -170,7 +170,7 @@ def makeEnemyWindow():
     # create and return window containing new elements
     return sg.Window('Scribble', layout_final, size=(800,400))
 
-def invMenuLogic():
+def invMenuLogic(values):
     # create dictionary of item information
     item = Item(values['-Item Name-'], values['-Item Desc-'])
 
@@ -183,7 +183,7 @@ def invMenuLogic():
     else:
         print("You are missing fields in item")
 
-def enemiesMenuLogic():
+def enemiesMenuLogic(values):
     # create dictionary of enemy information
     enemy = Enemy(values['-Enemy Name-'], values['-Enemy Desc-'])
     # if enemy fields have data, add them to json
@@ -218,9 +218,9 @@ def runApplication(window):
 
         # logic for each window: Inventory, Enemies
         if event == 'Enter' and CURRENT_WINDOW == 'Inventory':
-            invMenuLogic()
+            invMenuLogic(values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Enemies':
-            enemiesMenuLogic()
+            enemiesMenuLogic(values)
 
 window = makeMainMenuWindow() # create the first initial window
 runApplication(window) # start running program logic
