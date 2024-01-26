@@ -24,6 +24,7 @@ import configparser # library needed to parse the 'config.ini' file located in '
 #global variables / constants
 CONFIG = 'settings/config.ini'
 INVENTORY_JSON = 'data-base/inventory.json'
+ENEMY_JSON = 'data-base/enemies.json'
 
 # classes
 # Item - consumables, foods, passive, etc
@@ -88,6 +89,7 @@ class Enemy:
         self.__desc = desc
 
     # convert class data into dictionary and return
+    def toDict(self):
         return {
             'name': self.__name,
             'desc': self.__desc
@@ -168,11 +170,21 @@ while True:
         item = Item(values['-Item Name-'], values['-Item Desc-'])
         enemy = Enemy(values['-Enemy Name-'], values['-Enemy Desc-'])
 
-        # (DOES NOT WORK) if input fields are empty, don't save to the .json
-        if '' not in values or ' ' not in values:
+        # if inventory fields have data, add them to json
+        if bool(values['-Item Name-']) == True and bool(values['-Item Desc-']) == True:
             existingItems = loadJsonFile(INVENTORY_JSON)
             existingItems.append(item.toDict())
             saveToJson(existingItems, INVENTORY_JSON)
             print("Successfully printed to json")
+        else:
+            print("You are missing fields in item")
+
+        # if enemy fields have data, add them to json
+        if bool(values['-Enemy Name-']) == True and bool(values['-Enemy Desc-']) == True:
+            existingEnemies = loadJsonFile(ENEMY_JSON)
+            existingEnemies.append(enemy.toDict())
+            saveToJson(existingEnemies, ENEMY_JSON)
+        else:
+            print("You are missing fields in enemy")
 
 window.close()
