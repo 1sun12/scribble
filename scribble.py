@@ -25,6 +25,7 @@ import configparser # library needed to parse the 'config.ini' file located in '
 CONFIG = 'settings/config.ini'
 INVENTORY_JSON = 'data-base/inventory.json'
 ENEMY_JSON = 'data-base/enemies.json'
+THEME = 'Topanga'
 
 # classes
 # Item - consumables, foods, passive, etc
@@ -124,23 +125,27 @@ def loadJsonFile(fileName):
 # makeWindow - build the application, not deploy it yet
 def makeWindow():
     # set color palette / theme of application
-    sg.theme('Topanga')
+    sg.theme(THEME)
+
+    # list containing the menu bar, the buttons that run across the top of the application (CURRENTLY DOES NOTHING BESIDES DISPLAY) 1/26/24 @ 9:32AM
+    layout_menu = [[sg.Menu([['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
 
     # list containing data input elements for items and inventory management
     layout_inv = [[sg.Text('Add Item')],
-                  [sg.Text('Name:'), sg.Input(k = '-Item Name-')],
-                  [sg.Text('Desc:'), sg.Input(k = '-Item Desc-')]]
+                  [sg.Text('Name:'), sg.Input(k = '-Item Name-', do_not_clear=False)],
+                  [sg.Text('Desc:'), sg.Input(k = '-Item Desc-', do_not_clear=False)]]
 
     # list containing data input elements for enemy management
     layout_enemy = [[sg.Text('Enemy')],
-                    [sg.Text('Name:'), sg.Input(k = '-Enemy Name-')],
-                    [sg.Text('Desc:'), sg.Input(k = '-Enemy Desc-')]]
+                    [sg.Text('Name:'), sg.Input(k = '-Enemy Name-', do_not_clear=False)],
+                    [sg.Text('Desc:'), sg.Input(k = '-Enemy Desc-', do_not_clear=False)]]
 
     # list containing button elements for GUI interaction
-    layout_buttons = [[sg.Button('Enter')]]
+    layout_buttons = [[sg.Button('Enter'), sg.Button('Clear')]]
 
     # layout containing all previously made layouts
-    layout_final = [[sg.Col(layout_inv, p=0), sg.Col(layout_enemy, p=0)],
+    layout_final = [[layout_menu],
+                    [sg.Col(layout_inv, p=0), sg.Col(layout_enemy, p=0)],
                     [layout_buttons]]
 
     # create a window and add list of elements to window as a parameter in it's constructor
