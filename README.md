@@ -1,4 +1,4 @@
-# DND = Dungeons & Databases!
+# Scribble = Dungeons & Databases Note Taking Software!
 ## Authors: sun & RogueFylkir
 ---
 
