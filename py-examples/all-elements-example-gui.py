@@ -68,7 +68,7 @@ def make_window(theme=None):
                 [name('Sizegrip'), sg.Sizegrip()]  ]
 
     # Note - LOCAL Menu element is used (see about for how that's defined)
-    layout = [[Menu([['File', ['Exit']], ['Edit', ['Edit Me', ]]],  k='-CUST MENUBAR-',p=0)],
+    layout = [[Menu([['File', ['Exit']], ['Edit', ['Edit Me']]],  k='-CUST MENUBAR-',p=0)],
               [sg.T('PySimpleGUI Elements - Use Combo to Change Themes', font='_ 14', justification='c', expand_x=True)],
               [sg.Checkbox('Use Custom Titlebar & Menubar', use_custom_titlebar, enable_events=True, k='-USE CUSTOM TITLEBAR-', p=0)],
               [sg.Col(layout_l, p=0), sg.Col(layout_r, p=0)]]

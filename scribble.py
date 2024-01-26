@@ -26,6 +26,7 @@ CONFIG = 'settings/config.ini'
 INVENTORY_JSON = 'data-base/inventory.json'
 ENEMY_JSON = 'data-base/enemies.json'
 THEME = 'Topanga'
+CURRENT_WINDOW = None
 
 # classes
 # Item - consumables, foods, passive, etc
@@ -122,37 +123,80 @@ def loadJsonFile(fileName):
             json.dump([], jsonFile)
         return []
 
-# makeWindow - build the application, not deploy it yet
-def makeWindow():
+# return a list containing data elements for item adding/removing
+def createLayoutMenu():
+    return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
+
+def createLayoutInv():
+    return [[sg.Text('Add Item')],
+            [sg.Text('Name:'), sg.Input(k = '-Item Name-', do_not_clear=False)],
+            [sg.Text('Desc:'), sg.Input(k = '-Item Desc-', do_not_clear=False)]]
+
+def createLayoutEnemy():
+    return [[sg.Text('Enemy')],
+            [sg.Text('Name:'), sg.Input(k = '-Enemy Name-', do_not_clear=False)],
+            [sg.Text('Desc:'), sg.Input(k = '-Enemy Desc-', do_not_clear=False)]]
+
+def createLayoutButtons():
+    return [[sg.Button('Enter')]]
+
+# return the created mainMenu window
+def makeMainMenuWindow():
     # set color palette / theme of application
     sg.theme(THEME)
 
-    # list containing the menu bar, the buttons that run across the top of the application (CURRENTLY DOES NOTHING BESIDES DISPLAY) 1/26/24 @ 9:32AM
-    layout_menu = [[sg.Menu([['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
-
-    # list containing data input elements for items and inventory management
-    layout_inv = [[sg.Text('Add Item')],
-                  [sg.Text('Name:'), sg.Input(k = '-Item Name-', do_not_clear=False)],
-                  [sg.Text('Desc:'), sg.Input(k = '-Item Desc-', do_not_clear=False)]]
-
-    # list containing data input elements for enemy management
-    layout_enemy = [[sg.Text('Enemy')],
-                    [sg.Text('Name:'), sg.Input(k = '-Enemy Name-', do_not_clear=False)],
-                    [sg.Text('Desc:'), sg.Input(k = '-Enemy Desc-', do_not_clear=False)]]
-
-    # list containing button elements for GUI interaction
-    layout_buttons = [[sg.Button('Enter'), sg.Button('Clear')]]
-
-    # layout containing all previously made layouts
-    layout_final = [[layout_menu],
-                    [sg.Col(layout_inv, p=0), sg.Col(layout_enemy, p=0)],
-                    [layout_buttons]]
+    # layout containing Menu and some header text
+    layout_final = [[createLayoutMenu()],
+                    [sg.Text('Welcome to Scribble!', font='_ 14', justification='c', expand_x=True)]]
 
     # create a window and add list of elements to window as a parameter in it's constructor
-    return sg.Window('Scribble', layout_final)
+    return sg.Window('Scribble', layout_final, size=(800, 400))
+
+# return the created inventory window
+def makeInventoryWindow():
+    # layout containing Menu, Inventory, and Buttons
+    layout_final = [[createLayoutMenu()],
+                    [createLayoutInv()],
+                    [createLayoutButtons()]]
+    # create and return window containing new elements
+    return sg.Window('Scribble', layout_final, size=(800,400))
+
+# return the created enemy window
+def makeEnemyWindow():
+    # layout containing Menu, Enemy, and Buttons
+    layout_final = [[createLayoutMenu()],
+                    [createLayoutEnemy()],
+                    [createLayoutButtons()]]
+
+    # create and return window containing new elements
+    return sg.Window('Scribble', layout_final, size=(800,400))
+
+def invMenuLogic():
+        # create dictionary of item information
+        item = Item(values['-Item Name-'], values['-Item Desc-'])
+
+        # if inventory fields have data, add them to json
+        if bool(values['-Item Name-']) == True and bool(values['-Item Desc-']) == True:
+            existingItems = loadJsonFile(INVENTORY_JSON)
+            existingItems.append(item.toDict())
+            saveToJson(existingItems, INVENTORY_JSON)
+            print("Successfully printed to json")
+        else:
+            print("You are missing fields in item")
+
+def enemiesMenuLogic():
+    # create dictionary of enemy information
+        enemy = Enemy(values['-Enemy Name-'], values['-Enemy Desc-'])
+        # if enemy fields have data, add them to json
+        if bool(values['-Enemy Name-']) == True and bool(values['-Enemy Desc-']) == True:
+            existingEnemies = loadJsonFile(ENEMY_JSON)
+            existingEnemies.append(enemy.toDict())
+            saveToJson(existingEnemies, ENEMY_JSON)
+        else:
+            print("You are missing fields in enemy")
 
 # calls makeWindow, application is built and deployed here
-window = makeWindow()
+window = makeMainMenuWindow()
 
 '''
 needed for closing program properly
@@ -169,27 +213,22 @@ while True:
     if event == sg.WIN_CLOSED:
         break
 
-    # if 'enter' is pressed, enter item information into 'inventory.json'
-    if event == 'Enter':
-        # create dictionary of item information
-        item = Item(values['-Item Name-'], values['-Item Desc-'])
-        enemy = Enemy(values['-Enemy Name-'], values['-Enemy Desc-'])
+    # if 'Inventory' is selected in the Menu
+    if event == 'Inventory':
+        window.close()
+        window = makeInventoryWindow()
+        CURRENT_WINDOW = 'Inventory'
 
-        # if inventory fields have data, add them to json
-        if bool(values['-Item Name-']) == True and bool(values['-Item Desc-']) == True:
-            existingItems = loadJsonFile(INVENTORY_JSON)
-            existingItems.append(item.toDict())
-            saveToJson(existingItems, INVENTORY_JSON)
-            print("Successfully printed to json")
-        else:
-            print("You are missing fields in item")
+    # if 'Enemy' is selected in the Menu
+    if event == 'Enemies':
+        window.close()
+        window = makeEnemyWindow()
+        CURRENT_WINDOW = 'Enemies'
 
-        # if enemy fields have data, add them to json
-        if bool(values['-Enemy Name-']) == True and bool(values['-Enemy Desc-']) == True:
-            existingEnemies = loadJsonFile(ENEMY_JSON)
-            existingEnemies.append(enemy.toDict())
-            saveToJson(existingEnemies, ENEMY_JSON)
-        else:
-            print("You are missing fields in enemy")
+    # logic for each window: Inventoy, Enemies
+    if event == 'Enter' and CURRENT_WINDOW == 'Inventory':
+        invMenuLogic()
+    elif event == 'Enter' and CURRENT_WINDOW == 'Enemies':
+        enemiesMenuLogic()
 
 window.close()
