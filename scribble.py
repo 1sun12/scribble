@@ -19,11 +19,12 @@ Code Format (in order):
 import PySimpleGUI as sg # library needed for graphical elements, website: https://www.pysimplegui.org/en/latest/
 import json # library needed for .json parsing and manipulation
 import configparser # library needed to parse the 'config.ini' file located in 'settings'
+from pathlib import Path
 
 #global variables / constants
-CONFIG = 'settings/config.ini'
-INVENTORY_JSON = 'data-base/inventory.json'
-ENEMY_JSON = 'data-base/enemies.json'
+CONFIG = 'config.ini'
+INVENTORY_JSON = 'inventory.json'
+ENEMY_JSON = 'enemies.json'
 THEME = 'Topanga'
 CURRENT_WINDOW = None
 
