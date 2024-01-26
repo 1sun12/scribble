@@ -171,28 +171,28 @@ def makeEnemyWindow():
     return sg.Window('Scribble', layout_final, size=(800,400))
 
 def invMenuLogic():
-        # create dictionary of item information
-        item = Item(values['-Item Name-'], values['-Item Desc-'])
+    # create dictionary of item information
+    item = Item(values['-Item Name-'], values['-Item Desc-'])
 
-        # if inventory fields have data, add them to json
-        if bool(values['-Item Name-']) == True and bool(values['-Item Desc-']) == True:
-            existingItems = loadJsonFile(INVENTORY_JSON)
-            existingItems.append(item.toDict())
-            saveToJson(existingItems, INVENTORY_JSON)
-            print("Successfully printed to json")
-        else:
-            print("You are missing fields in item")
+    # if inventory fields have data, add them to json
+    if bool(values['-Item Name-']) == True and bool(values['-Item Desc-']) == True:
+        existingItems = loadJsonFile(INVENTORY_JSON)
+        existingItems.append(item.toDict())
+        saveToJson(existingItems, INVENTORY_JSON)
+        print("Successfully printed to json")
+    else:
+        print("You are missing fields in item")
 
 def enemiesMenuLogic():
     # create dictionary of enemy information
-        enemy = Enemy(values['-Enemy Name-'], values['-Enemy Desc-'])
-        # if enemy fields have data, add them to json
-        if bool(values['-Enemy Name-']) == True and bool(values['-Enemy Desc-']) == True:
-            existingEnemies = loadJsonFile(ENEMY_JSON)
-            existingEnemies.append(enemy.toDict())
-            saveToJson(existingEnemies, ENEMY_JSON)
-        else:
-            print("You are missing fields in enemy")
+    enemy = Enemy(values['-Enemy Name-'], values['-Enemy Desc-'])
+    # if enemy fields have data, add them to json
+    if bool(values['-Enemy Name-']) == True and bool(values['-Enemy Desc-']) == True:
+        existingEnemies = loadJsonFile(ENEMY_JSON)
+        existingEnemies.append(enemy.toDict())
+        saveToJson(existingEnemies, ENEMY_JSON)
+    else:
+        print("You are missing fields in enemy")
 
 # all program logic
 def runApplication(window):
@@ -216,7 +216,7 @@ def runApplication(window):
             window = makeEnemyWindow()
             CURRENT_WINDOW = 'Enemies'
 
-        # logic for each window: Inventoy, Enemies
+        # logic for each window: Inventory, Enemies
         if event == 'Enter' and CURRENT_WINDOW == 'Inventory':
             invMenuLogic()
         elif event == 'Enter' and CURRENT_WINDOW == 'Enemies':
