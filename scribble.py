@@ -83,20 +83,15 @@ class Enemy:
     __stats = None
 
     # constructor
-    def __init__(self, name, desc, stats):
+    def __init__(self, name, desc):
         self.__name = name
         self.__desc = desc
-        self.__stats = stats
 
     # convert class data into dictionary and return
-    def toDict(self):
-        tempDict = {
+        return {
             'name': self.__name,
             'desc': self.__desc
         }
-
-        tempDict.append(self.__stats.toDict())
-        return tempDict
 
 # public functions
 # saveToJson - takes a dictionary and string as input, saves data to fileName.json
@@ -171,8 +166,13 @@ while True:
     if event == 'Enter':
         # create dictionary of item information
         item = Item(values['-Item Name-'], values['-Item Desc-'])
-        existingItems = loadJsonFile(INVENTORY_JSON)
-        existingItems.append(item.toDict())
-        saveToJson(existingItems, INVENTORY_JSON)
+        enemy = Enemy(values['-Enemy Name-'], values['-Enemy Desc-'])
+
+        # (DOES NOT WORK) if input fields are empty, don't save to the .json
+        if '' not in values or ' ' not in values:
+            existingItems = loadJsonFile(INVENTORY_JSON)
+            existingItems.append(item.toDict())
+            saveToJson(existingItems, INVENTORY_JSON)
+            print("Successfully printed to json")
 
 window.close()
