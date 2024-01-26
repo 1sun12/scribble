@@ -10,5 +10,9 @@
   {
     "name": "",
     "desc": ""
+  },
+  {
+    "name": "bomb",
+    "desc": "this is an item that xplodes"
   }
 ]
