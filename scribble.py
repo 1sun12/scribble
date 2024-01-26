@@ -14,8 +14,7 @@ Code Format (in order):
 - classes
 - private functions
 - public functions
-- makeWindow
-- while loop action logic
+- while loop action logic function
 '''
 import PySimpleGUI as sg # library needed for graphical elements, website: https://www.pysimplegui.org/en/latest/
 import json # library needed for .json parsing and manipulation
@@ -195,40 +194,34 @@ def enemiesMenuLogic():
         else:
             print("You are missing fields in enemy")
 
-# calls makeWindow, application is built and deployed here
-window = makeMainMenuWindow()
+# all program logic
+def runApplication(window):
+    while True:
+        # when program is interacted with, capture that action as a variable
+        event, values = window.read()
 
-'''
-needed for closing program properly
-runs indefinite 'action listener' that captures actions. Like clicking buttons, typing, etc.
-actions that are made are set equal to the 'event' and 'values' variable.
+        # if 'X' button is pressed, close program and break from while loop
+        if event == sg.WIN_CLOSED:
+            break
 
-if 'event' is clicking the X close button, while loop breaks and ends program
-'''
-while True:
-    # when program is interacted with, capture that action as a variable
-    event, values = window.read()
+        # if 'Inventory' is selected in the Menu
+        if event == 'Inventory':
+            window.close()
+            window = makeInventoryWindow()
+            CURRENT_WINDOW = 'Inventory'
 
-    # if 'X' button is pressed, close program and break from while loop
-    if event == sg.WIN_CLOSED:
-        break
+        # if 'Enemy' is selected in the Menu
+        if event == 'Enemies':
+            window.close()
+            window = makeEnemyWindow()
+            CURRENT_WINDOW = 'Enemies'
 
-    # if 'Inventory' is selected in the Menu
-    if event == 'Inventory':
-        window.close()
-        window = makeInventoryWindow()
-        CURRENT_WINDOW = 'Inventory'
+        # logic for each window: Inventoy, Enemies
+        if event == 'Enter' and CURRENT_WINDOW == 'Inventory':
+            invMenuLogic()
+        elif event == 'Enter' and CURRENT_WINDOW == 'Enemies':
+            enemiesMenuLogic()
 
-    # if 'Enemy' is selected in the Menu
-    if event == 'Enemies':
-        window.close()
-        window = makeEnemyWindow()
-        CURRENT_WINDOW = 'Enemies'
-
-    # logic for each window: Inventoy, Enemies
-    if event == 'Enter' and CURRENT_WINDOW == 'Inventory':
-        invMenuLogic()
-    elif event == 'Enter' and CURRENT_WINDOW == 'Enemies':
-        enemiesMenuLogic()
-
-window.close()
+window = makeMainMenuWindow() # create the first initial window
+runApplication(window) # start running program logic
+window.close() # when the while loop in `runApplication` is broken, close the application
