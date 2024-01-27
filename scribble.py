@@ -34,21 +34,26 @@ class Item:
     # __private variables
     __name = None
     __desc = None
-    __count = None
-    __consumable = None
-    __activeOrPassive = None
-    __key = None
+    __count = None # how many of this item you have
+    __activeOrPassive = None # is a consumable or a passive item
+    __key = None # cannot be removed from inventory
 
     # constructor
-    def __init__(self, name, desc):
+    def __init__(self, name, desc, count, key):
         self.__name = name
         self.__desc = desc
+        self.__count = count
+        self.__activeOrPassive = 'Active'
+        self.__key = key
 
     # convert class data into dictionary and return
     def toDict(self):
         return {
             'name': self.__name,
-            'desc': self.__desc
+            'desc': self.__desc,
+            'count': self.__count,
+            'activeOrPassive': self.__activeOrPassive,
+            'key': self.__key
         }
 
 # Stats = data container for statistical information about your character, enemies, allies
@@ -123,14 +128,22 @@ def loadJsonFile(fileName):
             json.dump([], jsonFile)
         return []
 
-# return a list containing data elements for item adding/removing
+def ItemActiveOrPassive(values):
+    if values['Active'] == True:
+        return True
+    else:
+        return False
+
 def createLayoutMenu():
     return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
 
 def createLayoutInv():
-    return [[sg.Text('Add Item')],
+    return [[sg.Text('Add Item', font='_ 14')],
             [sg.Text('Name:'), sg.Input(k = '-Item Name-', do_not_clear=False)],
-            [sg.Text('Desc:'), sg.Input(k = '-Item Desc-', do_not_clear=False)]]
+            [sg.Text('Desc:'), sg.Input(k = '-Item Desc-', do_not_clear=False)],
+            [sg.Text('Count:'), sg.Input(k = '-Count-', do_not_clear=False)],
+            [sg.Radio('Active', 1, key='-Active-'), sg.Radio('Passive', 1, key='-Passive-')],
+            [sg.Radio('Key', 2, key='-Key-')]]
 
 def createLayoutEnemy():
     return [[sg.Text('Enemy')],
@@ -145,38 +158,29 @@ def makeMainMenuWindow():
     # set color palette / theme of application
     sg.theme(THEME)
 
-    # layout containing Menu and some header text
     layout_final = [[createLayoutMenu()],
                     [sg.Text('Welcome to Scribble!', font='_ 14', justification='c', expand_x=True)]]
 
-    # create a window and add list of elements to window as a parameter in it's constructor
     return sg.Window('Scribble', layout_final, size=(800, 400))
 
-# return the created inventory window
 def makeInventoryWindow():
-    # layout containing Menu, Inventory, and Buttons
     layout_final = [[createLayoutMenu()],
                     [createLayoutInv()],
                     [createLayoutButtons()]]
-    # create and return window containing new elements
     return sg.Window('Scribble', layout_final, size=(800,400))
 
-# return the created enemy window
 def makeEnemyWindow():
-    # layout containing Menu, Enemy, and Buttons
     layout_final = [[createLayoutMenu()],
                     [createLayoutEnemy()],
                     [createLayoutButtons()]]
 
-    # create and return window containing new elements
     return sg.Window('Scribble', layout_final, size=(800,400))
 
 def invMenuLogic(values):
-    # create dictionary of item information
-    item = Item(values['-Item Name-'], values['-Item Desc-'])
+    item = Item(values['-Item Name-'], values['-Item Desc-'], values['-Count-'], values['-Key-'])
 
     # if inventory fields have data, add them to json
-    if bool(values['-Item Name-']) == True and bool(values['-Item Desc-']) == True:
+    if bool(values['-Item Name-']) == True and bool(values['-Item Desc-']) == True and bool(values['-Count-']) == True and bool(values['-Key-']):
         existingItems = loadJsonFile(INVENTORY_JSON)
         existingItems.append(item.toDict())
         saveToJson(existingItems, INVENTORY_JSON)
@@ -185,8 +189,8 @@ def invMenuLogic(values):
         print("You are missing fields in item")
 
 def enemiesMenuLogic(values):
-    # create dictionary of enemy information
     enemy = Enemy(values['-Enemy Name-'], values['-Enemy Desc-'])
+
     # if enemy fields have data, add them to json
     if bool(values['-Enemy Name-']) == True and bool(values['-Enemy Desc-']) == True:
         existingEnemies = loadJsonFile(ENEMY_JSON)
