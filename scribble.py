@@ -184,10 +184,8 @@ def createLayoutEnemy():
 # formats the dice rolling display
 def createLayoutDice():
     return [[sg.Text('Dice Roller',font='_ 14', justification='center',expand_x=True)],
-            [sg.Text('# of Dice'),sg.Input(k ='-Dice Numbers-', do_not_clear=False, s=(10,1)),
-             sg.Text('# of Sides'), sg.Input(k ='-Dice Sides-', do_not_clear=False, s=(10,1)), sg.Button('Roll')],
-            [sg.Text('Number Rolled - ') ,sg.Text(s=(20,1), key = '-Output-')]
-            ]
+            [sg.Text('# of Dice'),sg.Input(k ='-Dice Numbers-', do_not_clear=False, s=(10,1)), sg.Text('# of Sides'), sg.Input(k ='-Dice Sides-', do_not_clear=False, s=(10,1)), sg.Button('Roll')],
+            [sg.Text('Number Rolled - ') ,sg.Text(s=(20,1), key = '-Output-')]]
 
 # formats the button layout
 def createLayoutButtons():
@@ -240,8 +238,17 @@ def enemiesMenuLogic(values):
     else:
         print("You are missing fields in enemy")
 
-# dice commands
-
+def diceMenuLogic(window, values):
+    sides = int(values['-Dice Sides-'])
+    numOfDie = int(values['-Dice Numbers-'])
+    finalValue = 0
+    for x in range(0, numOfDie):
+        numberRolled = random.randrange(1, sides+1)
+        finalValue = finalValue + numberRolled
+    if numberRolled == sides and sides == 20:
+        window['-Output-'].update(str(finalValue) + ' - CRIT!')
+    else:
+        window['-Output-'].update(finalValue)
 
 # all program logic
 def runApplication(window):
@@ -275,16 +282,7 @@ def runApplication(window):
         elif event == 'Enter' and CURRENT_WINDOW == 'Enemies':
             enemiesMenuLogic(values)
         elif event == 'Roll' and CURRENT_WINDOW == 'Roller': #Large piece for rolling, took a lot more lines than I thought
-            sides = int(values['-Dice Sides-'])
-            numOfDie = int(values['-Dice Numbers-'])
-            finalValue = 0
-            for x in range(0, numOfDie):
-                numberRolled = random.randrange(1, sides+1)
-                finalValue = finalValue + numberRolled
-            if numberRolled == sides and sides == 20:
-                window['-Output-'].update(str(finalValue) + ' - CRIT!')
-            else:
-                window['-Output-'].update(finalValue)
+            diceMenuLogic(window, values)
 
 window = makeMainMenuWindow() # create the first initial window
 runApplication(window) # start running program logic
