@@ -184,7 +184,8 @@ def createLayoutEnemy():
 # formats the dice rolling display
 def createLayoutDice():
     return [[sg.Text('Dice Roller',font='_ 14', justification='center',expand_x=True)],
-            [sg.Text('# of Dice'),sg.Input(k ='-Dice Numbers-', do_not_clear=False, s=(10,1)), sg.Text('# of Sides'), sg.Input(k ='-Dice Sides-', do_not_clear=False, s=(10,1)), sg.Button('Roll')],
+            [sg.Text('# of Dice'),sg.Input(k ='-Dice Numbers-', do_not_clear=False, s=(10,1)),
+             sg.Text('# of Sides'), sg.Input(k ='-Dice Sides-', do_not_clear=False, s=(10,1)), sg.Button('Roll')],
             [sg.Text('Number Rolled - ') ,sg.Text(s=(20,1), key = '-Output-')]
             ]
 
@@ -273,7 +274,7 @@ def runApplication(window):
             invMenuLogic(values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Enemies':
             enemiesMenuLogic(values)
-        elif event == 'Roll' and CURRENT_WINDOW == 'Roller':
+        elif event == 'Roll' and CURRENT_WINDOW == 'Roller': #Large piece for rolling, took a lot more lines than I thought
             sides = int(values['-Dice Sides-'])
             numOfDie = int(values['-Dice Numbers-'])
             finalValue = 0
