@@ -21,30 +21,69 @@ import json # library needed for .json parsing and manipulation
 import configparser # library needed to parse the 'config.ini' file located in 'settings'
 from pathlib import Path
 
-#global variables / constants
 CONFIG = 'config.ini'
 INVENTORY_JSON = 'inventory.json'
 ENEMY_JSON = 'enemies.json'
 THEME = 'Topanga'
 CURRENT_WINDOW = None
 
-# classes
-# Item - consumables, foods, passive, etc
 class Item:
-    # __private variables
     __name = None
     __desc = None
     __count = None # how many of this item you have
     __activeOrPassive = None # is a consumable or a passive item
     __key = None # cannot be removed from inventory
 
-    # constructor
-    def __init__(self, name, desc, count, key):
-        self.__name = name
-        self.__desc = desc
-        self.__count = count
-        self.__activeOrPassive = 'Active'
-        self.__key = key
+    def __init__(self, values):
+        self.__name = values['-Item Name-']
+        self.__desc = values['-Item Desc-']
+        self.__count = values['-Item Count-']
+        self.__activeOrPassive = self.activeOrPassive(values)
+        self.__key = self.keyOrNotKey(values)
+
+    def getName():
+        return __name
+    def getDesc():
+        return __desc
+    def getCount():
+        return __count
+    def getActiveOrPassive():
+        return __activeOrPassive
+    def getKey():
+        return __key
+
+    def setName(self, a):
+        self.__name = a
+    def setDesc(self, a):
+        self.__desc = a
+    def setCount(self, a):
+        self.__count = a
+    def setActiveOrPassive(self, a):
+        self.__activeOrPassive = a
+    def setKey(self, a):
+        self.__key = a
+
+    # determine weither or not the item is active or passive
+    def activeOrPassive(self, values):
+        if bool(values['-Item Passive-']) == True:
+            return 'Passive'
+        else:
+            return 'Active'
+
+    # determine weither or not the item is permanant to your inv.
+    def keyOrNotKey(self, values):
+        if bool(values['-Item Key-']) == True:
+            return 'Key'
+        else:
+            return 'Not Key'
+
+    # check if all variables have a value
+    def allFieldsFilled(self):
+        values = self.toDict()
+        for k in values.values():
+            if bool(k) == False:
+                return False
+        return True
 
     # convert class data into dictionary and return
     def toDict(self):
@@ -56,9 +95,8 @@ class Item:
             'key': self.__key
         }
 
-# Stats = data container for statistical information about your character, enemies, allies
+# Stats - data container for statistical information about your character, enemies, allies
 class Stats:
-    # private variables
     __hp = None
     __str = None
     __dex = None
@@ -67,7 +105,6 @@ class Stats:
     __wis = None
     __cha = None
 
-    # constructor
     def __init__(self, hp):
         self.__hp = hp
 
@@ -85,12 +122,10 @@ class Stats:
 
 # Enemy - their stats, dropped items, equipment, name and description, and optional .PNG photo of enemy for battleboard
 class Enemy:
-    # private variables
     __name = None
     __desc = None
     __stats = None
 
-    # constructor
     def __init__(self, name, desc):
         self.__name = name
         self.__desc = desc
@@ -102,14 +137,13 @@ class Enemy:
             'desc': self.__desc
         }
 
-# public functions
-# saveToJson - takes a dictionary and string as input, saves data to fileName.json
+# takes a dictionary and string as input, saves data to fileName.json
 def saveToJson(info, fileName):
     with open(fileName, 'w') as jsonFile:
         json.dump(info, jsonFile, indent = 2)
         print(f'Successfully entered info into {fileName}')
 
-# loadJsonFile - returns a dictionary containing all data from .json file
+# returns a dictionary containing all data from .json file
 def loadJsonFile(fileName):
     try:
         with open(fileName, 'r') as jsonFile:
@@ -128,12 +162,7 @@ def loadJsonFile(fileName):
             json.dump([], jsonFile)
         return []
 
-def ItemActiveOrPassive(values):
-    if values['Active'] == True:
-        return True
-    else:
-        return False
-
+# formats the inventory add/remove display
 def createLayoutMenu():
     return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
 
@@ -141,26 +170,25 @@ def createLayoutInv():
     return [[sg.Text('Add Item', font='_ 14')],
             [sg.Text('Name:'), sg.Input(k = '-Item Name-', do_not_clear=False)],
             [sg.Text('Desc:'), sg.Input(k = '-Item Desc-', do_not_clear=False)],
-            [sg.Text('Count:'), sg.Input(k = '-Count-', do_not_clear=False)],
-            [sg.Radio('Active', 1, key='-Active-'), sg.Radio('Passive', 1, key='-Passive-')],
-            [sg.Radio('Key', 2, key='-Key-')]]
+            [sg.Text('Count:'), sg.Input(k = '-Item Count-', do_not_clear=False)],
+            [sg.Radio('Active', 1, key='-Item Active-'), sg.Radio('Passive', 1, key='-Item Passive-')],
+            [sg.Radio('Key', 2, key='-Item Key-'), sg.Radio('Not Key', 2, key='-Item NotKey-')]]
 
+# formats the enemy add/remove display
 def createLayoutEnemy():
     return [[sg.Text('Enemy')],
             [sg.Text('Name:'), sg.Input(k = '-Enemy Name-', do_not_clear=False)],
             [sg.Text('Desc:'), sg.Input(k = '-Enemy Desc-', do_not_clear=False)]]
 
+# formats the button layout
 def createLayoutButtons():
     return [[sg.Button('Enter')]]
 
 # return the created mainMenu window
 def makeMainMenuWindow():
-    # set color palette / theme of application
-    sg.theme(THEME)
-
+    sg.theme(THEME) # set color palette / theme of application
     layout_final = [[createLayoutMenu()],
                     [sg.Text('Welcome to Scribble!', font='_ 14', justification='c', expand_x=True)]]
-
     return sg.Window('Scribble', layout_final, size=(800, 400))
 
 def makeInventoryWindow():
@@ -173,14 +201,13 @@ def makeEnemyWindow():
     layout_final = [[createLayoutMenu()],
                     [createLayoutEnemy()],
                     [createLayoutButtons()]]
-
     return sg.Window('Scribble', layout_final, size=(800,400))
 
 def invMenuLogic(values):
-    item = Item(values['-Item Name-'], values['-Item Desc-'], values['-Count-'], values['-Key-'])
+    item = Item(values) # create item object
 
     # if inventory fields have data, add them to json
-    if bool(values['-Item Name-']) == True and bool(values['-Item Desc-']) == True and bool(values['-Count-']) == True and bool(values['-Key-']):
+    if bool(item.allFieldsFilled()):
         existingItems = loadJsonFile(INVENTORY_JSON)
         existingItems.append(item.toDict())
         saveToJson(existingItems, INVENTORY_JSON)
@@ -202,8 +229,7 @@ def enemiesMenuLogic(values):
 # all program logic
 def runApplication(window):
     while True:
-        # when program is interacted with, capture that action as a variable
-        event, values = window.read()
+        event, values = window.read() # when program is interacted with, capture that action as a variable
 
         # if 'X' button is pressed, close program and break from while loop
         if event == sg.WIN_CLOSED:
