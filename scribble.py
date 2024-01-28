@@ -20,6 +20,7 @@ import PySimpleGUI as sg # library needed for graphical elements, website: https
 import json # library needed for .json parsing and manipulation
 import configparser # library needed to parse the 'config.ini' file located in 'settings'
 from pathlib import Path
+import random # library needed for the randomness of a dice roller
 
 CONFIG = 'config.ini'
 INVENTORY_JSON = 'inventory.json'
@@ -164,7 +165,7 @@ def loadJsonFile(fileName):
 
 # formats the inventory add/remove display
 def createLayoutMenu():
-    return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
+    return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Dice', ['Roller']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
 
 def createLayoutInv():
     return [[sg.Text('Add Item', font='_ 14')],
@@ -179,6 +180,13 @@ def createLayoutEnemy():
     return [[sg.Text('Enemy')],
             [sg.Text('Name:'), sg.Input(k = '-Enemy Name-', do_not_clear=False)],
             [sg.Text('Desc:'), sg.Input(k = '-Enemy Desc-', do_not_clear=False)]]
+
+# formats the dice rolling display
+def createLayoutDice():
+    return [[sg.Text('Dice Roller',font='_ 14', justification='center',expand_x=True)],
+            [sg.Text('# of Dice'),sg.Input(k ='-Dice Numbers-', do_not_clear=False, s=(10,1)), sg.Text('# of Sides'), sg.Input(k ='-Dice Sides-', do_not_clear=False, s=(10,1)), sg.Button('Roll')],
+            [sg.Text('Number Rolled - ') ,sg.Text(s=(20,1), key = '-Output-')]
+            ]
 
 # formats the button layout
 def createLayoutButtons():
@@ -201,6 +209,11 @@ def makeEnemyWindow():
     layout_final = [[createLayoutMenu()],
                     [createLayoutEnemy()],
                     [createLayoutButtons()]]
+    return sg.Window('Scribble', layout_final, size=(800,400))
+
+def makeDiceWindow():
+    layout_final = [[createLayoutMenu()],
+                    [createLayoutDice()]]
     return sg.Window('Scribble', layout_final, size=(800,400))
 
 def invMenuLogic(values):
@@ -226,6 +239,9 @@ def enemiesMenuLogic(values):
     else:
         print("You are missing fields in enemy")
 
+# dice commands
+
+
 # all program logic
 def runApplication(window):
     while True:
@@ -247,11 +263,27 @@ def runApplication(window):
             window = makeEnemyWindow()
             CURRENT_WINDOW = 'Enemies'
 
+        if event == 'Roller':
+            window.close()
+            window = makeDiceWindow()
+            CURRENT_WINDOW = 'Roller'
+
         # logic for each window: Inventory, Enemies
         if event == 'Enter' and CURRENT_WINDOW == 'Inventory':
             invMenuLogic(values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Enemies':
             enemiesMenuLogic(values)
+        elif event == 'Roll' and CURRENT_WINDOW == 'Roller':
+            sides = int(values['-Dice Sides-'])
+            numOfDie = int(values['-Dice Numbers-'])
+            finalValue = 0
+            for x in range(0, numOfDie):
+                numberRolled = random.randrange(1, sides+1)
+                finalValue = finalValue + numberRolled
+            if numberRolled == sides and sides == 20:
+                window['-Output-'].update(str(finalValue) + ' - CRIT!')
+            else:
+                window['-Output-'].update(finalValue)
 
 window = makeMainMenuWindow() # create the first initial window
 runApplication(window) # start running program logic
