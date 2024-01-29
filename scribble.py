@@ -168,7 +168,7 @@ def createLayoutMenu():
     return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Search', ['Search']], ['Dice', ['Roller']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
 
 def createLayoutInv():
-    return [[sg.Text('Add Item', font='_ 14')],
+    return [[sg.Text('Add/Remove Item', font='_ 14')],
             [sg.Text('Name:'), sg.Input(k = '-Item Name-', do_not_clear=False)],
             [sg.Text('Desc:'), sg.Input(k = '-Item Desc-', do_not_clear=False)],
             [sg.Text('Count:'), sg.Input(k = '-Item Count-', do_not_clear=False)],
@@ -196,6 +196,9 @@ def createLayoutSearch():
 def createLayoutButtons():
     return [[sg.Button('Enter')]]
 
+def createLayoutInvButtons():
+    return [[sg.Button('Enter'), sg.Button('Remove (only name & count needed, -1 count = all)')]]
+
 # return the created mainMenu window
 def makeMainMenuWindow():
     sg.theme(THEME) # set color palette / theme of application
@@ -206,7 +209,7 @@ def makeMainMenuWindow():
 def makeInventoryWindow():
     layout_final = [[createLayoutMenu()],
                     [createLayoutInv()],
-                    [createLayoutButtons()]]
+                    [createLayoutInvButtons()]]
     return sg.Window('Scribble', layout_final, size=(800,400))
 
 def makeEnemyWindow():
