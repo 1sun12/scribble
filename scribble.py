@@ -197,7 +197,7 @@ def createLayoutButtons():
     return [[sg.Button('Enter')]]
 
 def createLayoutInvButtons():
-    return [[sg.Button('Enter'), sg.Button('Remove (only name & count needed, 0 count = all)')]]
+    return [[sg.Button('Enter'), sg.Button('Remove (only name & count needed, -1 count = database removal)')]]
 
 # return the created mainMenu window
 def makeMainMenuWindow():
@@ -245,40 +245,39 @@ def searchJsonViaName(values):
     return 0
 
 def invMenuRemoveLogic(values):
-    inputValue = None # convert input to lowercase
-    count = None # how many of the item we want to remove
-    item = Item(values) # create item object
-    data = loadJsonFile(INVENTORY_JSON) # store entire inv .json in memory
-    matchingItems = [] # list storing all entires that match our input
+    inputValue = values['-Item Name-'].strip()  # Get the name of the item to remove (trimmed)
+    count = int(values['-Item Count-'])  # Get the count of the item to remove
+    data = loadJsonFile(INVENTORY_JSON)  # Load inventory data from JSON
+    removed = False  # Flag to track if any item was removed
 
-    # make sure inputs are not NULL or empty b4 setting them equal to variables
-    if values['-Item Count-'] == '' or values['-Item Count-'] == ' ' or values['-Item Count-'] == None:
-        print('Error: non-valid count input')
+    # Iterate over the list of items and remove the matching item based on name and count
+    for item in data:
+        if item['name'].strip().lower() == inputValue.lower():
+            itemCount = int(item['count'])
+            if count < 0:
+                # Complete removal from database if count is negative and item is not a key
+                if item['key'] == 'Key':
+                    print('Item is a key and cannot be removed completely.')
+                else:
+                    data.remove(item)
+                    removed = True
+            else:
+                # Decrease the count of the item by the specified amount
+                newCount = max(0, itemCount - count)
+                item['count'] = newCount
+                if newCount == 0:
+                    data.remove(item)
+                    removed = True
+                else:
+                    print(f'Successfully removed {count} of that item.')
+
+    if removed:
+        print('Successfully removed item(s).')
     else:
-        count = int(values['-Item Count-'])
+        print('No matching item found or count is invalid.')
 
-    if values['-Item Name-'] == '' or values['-Item Name-'] == ' ' or values['-Item Name-'] == None:
-        print('Error: non-valid name input')
-    else:
-        inputValue = values['-Item Name-']
-
-    # search database for item
-    for x in data:
-        if x['name'].lower() == inputValue:
-            matchingItems.append(x)
-
-    # remove items stored in 'matchingItems' list by count
-    if matchingItems and count > 0:
-        for x in matchingItems:
-            x['count'] = int(x['count']) - count
-            if int(x['count']) < 0:
-                x['count'] = 0
-        print('Successfully removed item of specific count')
-    elif matchingItems and count <= 0: # remove all items
-        for x in matchingItems:
-            x['count'] = 0
-        print('Successfully removed all of that item')
-
+    # Save the updated inventory data to the JSON file
+    saveToJson(data, INVENTORY_JSON)
 
 def enemiesMenuLogic(values):
     enemy = Enemy(values['-Enemy Name-'], values['-Enemy Desc-'])
@@ -368,7 +367,7 @@ def runApplication(window):
             diceMenuLogic(window, values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Search':
             searchMenuInventoryLogic(values)
-        elif event == 'Remove (only name & count needed, 0 count = all)':
+        elif event == 'Remove (only name & count needed, -1 count = database removal)':
             invMenuRemoveLogic(values)
 
 
