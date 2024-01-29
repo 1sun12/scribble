@@ -20,6 +20,7 @@ import PySimpleGUI as sg # library needed for graphical elements, website: https
 import json # library needed for .json parsing and manipulation
 import configparser # library needed to parse the 'config.ini' file located in 'settings'
 import random # library needed for the randomness of a dice roller
+import re # regular expressions library; used for search feature
 
 CONFIG = 'config.ini'
 INVENTORY_JSON = 'inventory.json'
@@ -164,7 +165,7 @@ def loadJsonFile(fileName):
 
 # formats the inventory add/remove display
 def createLayoutMenu():
-    return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Dice', ['Roller']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
+    return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Search', ['Search']], ['Dice', ['Roller']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
 
 def createLayoutInv():
     return [[sg.Text('Add Item', font='_ 14')],
@@ -182,9 +183,14 @@ def createLayoutEnemy():
 
 # formats the dice rolling display
 def createLayoutDice():
-    return [[sg.Text('Dice Roller',font='_ 14', justification='center',expand_x=True)],
-            [sg.Text('# of Dice'),sg.Input(k ='-Dice Numbers-', do_not_clear=False, s=(10,1)), sg.Text('# of Sides'), sg.Input(k ='-Dice Sides-', do_not_clear=False, s=(10,1)), sg.Button('Roll')],
+    return [[sg.Text('Dice Roller', font='_ 14', justification='center', expand_x=True)],
+            [sg.Text('# of Dice'), sg.Input(k ='-Dice Numbers-', do_not_clear=False, s=(10,1)), sg.Text('# of Sides'), sg.Input(k ='-Dice Sides-', do_not_clear=False, s=(10,1)), sg.Button('Roll')],
             [sg.Text('Number Rolled - ') ,sg.Text(s=(20,1), key = '-Output-')]]
+
+def createLayoutSearch():
+    return [[sg.Text('Search Database', font='_ 14', justification='center', expand_x=True)],
+            [sg.Text('Name:'), sg.Input(k='-Search-', do_not_clear=False, s=(20, 1))],
+            [sg.Output(s=(75,13))]]
 
 # formats the button layout
 def createLayoutButtons():
@@ -212,6 +218,12 @@ def makeEnemyWindow():
 def makeDiceWindow():
     layout_final = [[createLayoutMenu()],
                     [createLayoutDice()]]
+    return sg.Window('Scribble', layout_final, size=(800,400))
+
+def makeSearchWindow():
+    layout_final = [[createLayoutMenu()],
+                    [createLayoutSearch()],
+                    [createLayoutButtons()]]
     return sg.Window('Scribble', layout_final, size=(800,400))
 
 def invMenuLogic(values):
@@ -249,6 +261,9 @@ def diceMenuLogic(window, values):
     else:
         window['-Output-'].update(finalValue)
 
+def searchMenuLogic(values):
+    print("hi")
+
 # all program logic
 def runApplication(window):
     while True:
@@ -270,10 +285,17 @@ def runApplication(window):
             window = makeEnemyWindow()
             CURRENT_WINDOW = 'Enemies'
 
+        # if 'Dice -> Roller' is selected in the Menu
         if event == 'Roller':
             window.close()
             window = makeDiceWindow()
             CURRENT_WINDOW = 'Roller'
+
+        # if 'Search -> Find' is selected in the Menu
+        if event == 'Search':
+            window.close()
+            window = makeSearchWindow()
+            CURRENT_WINDOW = 'Search'
 
         # logic for each window: Inventory, Enemies
         if event == 'Enter' and CURRENT_WINDOW == 'Inventory':
@@ -282,6 +304,9 @@ def runApplication(window):
             enemiesMenuLogic(values)
         elif event == 'Roll' and CURRENT_WINDOW == 'Roller': #Large piece for rolling, took a lot more lines than I thought
             diceMenuLogic(window, values)
+        elif event == 'Enter' and CURRENT_WINDOW == 'Search':
+            searchMenuLogic(values)
+
 
 window = makeMainMenuWindow() # create the first initial window
 runApplication(window) # start running program logic
