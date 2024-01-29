@@ -20,11 +20,11 @@ import PySimpleGUI as sg # library needed for graphical elements, website: https
 import json # library needed for .json parsing and manipulation
 import configparser # library needed to parse the 'config.ini' file located in 'settings'
 import random # library needed for the randomness of a dice roller
-import re # regular expressions library; used for search feature
 
 CONFIG = 'config.ini'
 INVENTORY_JSON = 'inventory.json'
 ENEMY_JSON = 'enemies.json'
+LOCATION_JSON = 'locations.json'
 THEME = 'Topanga'
 CURRENT_WINDOW = None
 
@@ -261,8 +261,28 @@ def diceMenuLogic(window, values):
     else:
         window['-Output-'].update(finalValue)
 
-def searchMenuLogic(values):
-    print("hi")
+def searchMenuInventoryLogic(values):
+    input_value = values['-Search-'].lower()  # Convert input to lowercase
+    inventory_items = loadJsonFile(INVENTORY_JSON) # Load inventory data from JSON
+    matching_items = [] # Create a list to store matching items
+
+    # Iterate over inventory items and check if the input matches item names
+    for item in inventory_items:
+        if item['name'].lower() == input_value:
+            matching_items.append(item)
+
+    # Display matching items or inform user if no match is found
+    if matching_items:
+        for item in matching_items:
+            print(f"Item Name: {item['name']}")
+            print(f"Description: {item['desc']}")
+            print(f"Count: {item['count']}")
+            print(f"Active/Passive: {item['activeOrPassive']}")
+            print(f"Key/Not Key: {item['key']}")
+            print('-' * 30)
+    else:
+        print('Item not found in database')
+
 
 # all program logic
 def runApplication(window):
@@ -305,7 +325,7 @@ def runApplication(window):
         elif event == 'Roll' and CURRENT_WINDOW == 'Roller': #Large piece for rolling, took a lot more lines than I thought
             diceMenuLogic(window, values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Search':
-            searchMenuLogic(values)
+            searchMenuInventoryLogic(values)
 
 
 window = makeMainMenuWindow() # create the first initial window
