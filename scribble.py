@@ -197,7 +197,7 @@ def createLayoutButtons():
     return [[sg.Button('Enter')]]
 
 def createLayoutInvButtons():
-    return [[sg.Button('Enter'), sg.Button('Remove (only name & count needed, -1 count = all)')]]
+    return [[sg.Button('Enter'), sg.Button('Remove (only name & count needed, 0 count = all)')]]
 
 # return the created mainMenu window
 def makeMainMenuWindow():
@@ -229,7 +229,7 @@ def makeSearchWindow():
                     [createLayoutButtons()]]
     return sg.Window('Scribble', layout_final, size=(800,400))
 
-def invMenuLogic(values):
+def invMenuAddLogic(values):
     item = Item(values) # create item object
 
     # if inventory fields have data, add them to json
@@ -240,6 +240,45 @@ def invMenuLogic(values):
         print("Successfully printed to json")
     else:
         print("You are missing fields in item")
+
+def searchJsonViaName(values):
+    return 0
+
+def invMenuRemoveLogic(values):
+    inputValue = None # convert input to lowercase
+    count = None # how many of the item we want to remove
+    item = Item(values) # create item object
+    data = loadJsonFile(INVENTORY_JSON) # store entire inv .json in memory
+    matchingItems = [] # list storing all entires that match our input
+
+    # make sure inputs are not NULL or empty b4 setting them equal to variables
+    if values['-Item Count-'] == '' or values['-Item Count-'] == ' ' or values['-Item Count-'] == None:
+        print('Error: non-valid count input')
+    else:
+        count = int(values['-Item Count-'])
+
+    if values['-Item Name-'] == '' or values['-Item Name-'] == ' ' or values['-Item Name-'] == None:
+        print('Error: non-valid name input')
+    else:
+        inputValue = values['-Item Name-']
+
+    # search database for item
+    for x in data:
+        if x['name'].lower() == inputValue:
+            matchingItems.append(x)
+
+    # remove items stored in 'matchingItems' list by count
+    if matchingItems and count > 0:
+        for x in matchingItems:
+            x['count'] = int(x['count']) - count
+            if int(x['count']) < 0:
+                x['count'] = 0
+        print('Successfully removed item of specific count')
+    elif matchingItems and count <= 0: # remove all items
+        for x in matchingItems:
+            x['count'] = 0
+        print('Successfully removed all of that item')
+
 
 def enemiesMenuLogic(values):
     enemy = Enemy(values['-Enemy Name-'], values['-Enemy Desc-'])
@@ -322,13 +361,15 @@ def runApplication(window):
 
         # logic for each window: Inventory, Enemies
         if event == 'Enter' and CURRENT_WINDOW == 'Inventory':
-            invMenuLogic(values)
+            invMenuAddLogic(values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Enemies':
             enemiesMenuLogic(values)
         elif event == 'Roll' and CURRENT_WINDOW == 'Roller': #Large piece for rolling, took a lot more lines than I thought
             diceMenuLogic(window, values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Search':
             searchMenuInventoryLogic(values)
+        elif event == 'Remove (only name & count needed, 0 count = all)':
+            invMenuRemoveLogic(values)
 
 
 window = makeMainMenuWindow() # create the first initial window
