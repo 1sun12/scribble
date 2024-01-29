@@ -169,9 +169,9 @@ def createLayoutMenu():
 
 def createLayoutInv():
     return [[sg.Text('Add/Remove Item', font='_ 14')],
-            [sg.Text('Name:'), sg.Input(k = '-Item Name-', do_not_clear=False)],
-            [sg.Text('Desc:'), sg.Input(k = '-Item Desc-', do_not_clear=False)],
-            [sg.Text('Count:'), sg.Input(k = '-Item Count-', do_not_clear=False)],
+            [sg.Text('Name:'), sg.Input(k = '-Item Name-', do_not_clear=False, s=(15,1))],
+            [sg.Text('Desc:'), sg.Input(k = '-Item Desc-', do_not_clear=False, s=(25,1))],
+            [sg.Text('Count:'), sg.Input(k = '-Item Count-', do_not_clear=False, s=(5,1))],
             [sg.Radio('Active', 1, key='-Item Active-'), sg.Radio('Passive', 1, key='-Item Passive-')],
             [sg.Radio('Key', 2, key='-Item Key-'), sg.Radio('Not Key', 2, key='-Item NotKey-')]]
 
@@ -197,7 +197,9 @@ def createLayoutButtons():
     return [[sg.Button('Enter')]]
 
 def createLayoutInvButtons():
-    return [[sg.Button('Enter'), sg.Button('Remove (only name & count needed, -1 count = database removal)')]]
+    return [[sg.Button('Enter'), sg.Button('Remove')],
+            [sg.Text('- Enter: Type JUST name and count to add more of this item to inv.')],
+            [sg.Text('- Remove: Type JUST name and count, # for that amount, 0 to set 0, or -1 to completely remove')]]
 
 # return the created mainMenu window
 def makeMainMenuWindow():
@@ -261,8 +263,7 @@ def invMenuRemoveLogic(values):
                 else:
                     data.remove(item)
                     removed = True
-            else:
-                # Decrease the count of the item by the specified amount
+            elif count > 0: # Decrease the count of the item by the specified amount
                 newCount = max(0, itemCount - count)
                 item['count'] = newCount
                 if newCount == 0:
@@ -270,6 +271,10 @@ def invMenuRemoveLogic(values):
                     removed = True
                 else:
                     print(f'Successfully removed {count} of that item.')
+            else: # set equal to 0
+                newCount = 0
+                item['count'] = newCount
+                removed = True
 
     if removed:
         print('Successfully removed item(s).')
@@ -367,7 +372,7 @@ def runApplication(window):
             diceMenuLogic(window, values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Search':
             searchMenuInventoryLogic(values)
-        elif event == 'Remove (only name & count needed, -1 count = database removal)':
+        elif event == 'Remove':
             invMenuRemoveLogic(values)
 
 
