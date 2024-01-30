@@ -20,6 +20,8 @@ import PySimpleGUI as sg # library needed for graphical elements, website: https
 import json # library needed for .json parsing and manipulation
 import configparser # library needed to parse the 'config.ini' file located in 'settings'
 import random # library needed for the randomness of a dice roller
+import os # interact with the file system and other operating system features
+import glob # search for files with a specific pattern
 
 CONFIG = 'config.ini'
 INVENTORY_JSON = 'inventory.json'
@@ -38,27 +40,27 @@ class Item:
     def __init__(self, values):
         self.__name = values['-Item Name-']
         self.__desc = values['-Item Desc-']
-        self.__count = values['-Item Count-']
+        self.__count = int(values['-Item Count-'])
         self.__activeOrPassive = self.activeOrPassive(values)
         self.__key = self.keyOrNotKey(values)
 
-    def getName():
-        return __name
-    def getDesc():
-        return __desc
-    def getCount():
-        return __count
-    def getActiveOrPassive():
-        return __activeOrPassive
-    def getKey():
-        return __key
+    def getName(self):
+        return self.__name
+    def getDesc(self):
+        return self.__desc
+    def getCount(self):
+        return self.__count
+    def getActiveOrPassive(self):
+        return self.__activeOrPassive
+    def getKey(self):
+        return self.__key
 
     def setName(self, a):
         self.__name = a
     def setDesc(self, a):
         self.__desc = a
     def setCount(self, a):
-        self.__count = a
+        self.__count = int(a)
     def setActiveOrPassive(self, a):
         self.__activeOrPassive = a
     def setKey(self, a):
@@ -168,10 +170,10 @@ def createLayoutMenu():
     return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Search', ['Search']], ['Dice', ['Roller']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
 
 def createLayoutInv():
-    return [[sg.Text('Add Item', font='_ 14')],
-            [sg.Text('Name:'), sg.Input(k = '-Item Name-', do_not_clear=False)],
-            [sg.Text('Desc:'), sg.Input(k = '-Item Desc-', do_not_clear=False)],
-            [sg.Text('Count:'), sg.Input(k = '-Item Count-', do_not_clear=False)],
+    return [[sg.Text('Add/Remove Item', font='_ 14')],
+            [sg.Text('Name:'), sg.Input(k = '-Item Name-', do_not_clear=False, s=(15,1))],
+            [sg.Text('Desc:'), sg.Input(k = '-Item Desc-', do_not_clear=False, s=(25,1))],
+            [sg.Text('Count:'), sg.Input(k = '-Item Count-', do_not_clear=False, s=(5,1))],
             [sg.Radio('Active', 1, key='-Item Active-'), sg.Radio('Passive', 1, key='-Item Passive-')],
             [sg.Radio('Key', 2, key='-Item Key-'), sg.Radio('Not Key', 2, key='-Item NotKey-')]]
 
@@ -196,6 +198,11 @@ def createLayoutSearch():
 def createLayoutButtons():
     return [[sg.Button('Enter')]]
 
+def createLayoutInvButtons():
+    return [[sg.Button('Enter'), sg.Button('Remove')],
+            [sg.Text('- Enter: Type JUST name and count to add more of this item to inv.')],
+            [sg.Text('- Remove: Type JUST name and count, # for that amount, 0 to set 0, or -1 to completely remove')]]
+
 # return the created mainMenu window
 def makeMainMenuWindow():
     sg.theme(THEME) # set color palette / theme of application
@@ -206,7 +213,7 @@ def makeMainMenuWindow():
 def makeInventoryWindow():
     layout_final = [[createLayoutMenu()],
                     [createLayoutInv()],
-                    [createLayoutButtons()]]
+                    [createLayoutInvButtons()]]
     return sg.Window('Scribble', layout_final, size=(800,400))
 
 def makeEnemyWindow():
@@ -226,17 +233,83 @@ def makeSearchWindow():
                     [createLayoutButtons()]]
     return sg.Window('Scribble', layout_final, size=(800,400))
 
-def invMenuLogic(values):
-    item = Item(values) # create item object
+def search(find):
+    currentDirectory = os.getcwd() # the current directory the script is located in
+    jsonFiles = glob.glob(os.path.join(currentDirectory, '*.json')) # create list of all .json files in current directory
+    jsonNames = [os.path.basename(file) for file in jsonFiles] # create list of all .json file names
 
-    # if inventory fields have data, add them to json
-    if bool(item.allFieldsFilled()):
-        existingItems = loadJsonFile(INVENTORY_JSON)
-        existingItems.append(item.toDict())
+    for jsonFile in jsonNames:
+        data = loadJsonFile(jsonFile)
+        for item in data:
+            if item['name'].lower() == find.lower():
+                return data
+    print('Search could not find item, does not exist?')
+    return []
+
+def invMenuAddLogic(values):
+    item = Item(values)  # Create item object
+    existingItems = search(item.getName())  # Search if item is pre-existing in database
+    existingItem = None  # Single item we are looking to edit
+
+    # Get the single item we are looking for in 'existingItems'
+    for x in existingItems:
+        if x['name'] == item.getName():
+            existingItem = x
+            break
+
+    if existingItem:
+        # If item already exists in the inventory, update its count
+        oldItemCount = int(existingItem['count'])
+        newCount = item.getCount()
+        existingItem['count'] = str(oldItemCount + newCount)  # Increase count by new count
         saveToJson(existingItems, INVENTORY_JSON)
-        print("Successfully printed to json")
     else:
-        print("You are missing fields in item")
+        # If item is not found in the inventory, add it
+        if item.allFieldsFilled():
+            existingItems = loadJsonFile(INVENTORY_JSON)
+            existingItems.append(item.toDict())
+            saveToJson(existingItems, INVENTORY_JSON)
+            print("Successfully added item to inventory")
+        else:
+            print("You are missing fields in item")
+
+def invMenuRemoveLogic(values):
+    inputValue = values['-Item Name-'].strip()  # Get the name of the item to remove (trimmed)
+    count = int(values['-Item Count-'])  # Get the count of the item to remove
+    data = loadJsonFile(INVENTORY_JSON)  # Load inventory data from JSON
+    removed = False  # Flag to track if any item was removed
+
+    # Iterate over the list of items and remove the matching item based on name and count
+    for item in data:
+        if item['name'].strip().lower() == inputValue.lower():
+            itemCount = int(item['count'])
+            if count < 0:
+                # Complete removal from database if count is negative and item is not a key
+                if item['key'] == 'Key':
+                    print('Item is a key and cannot be removed completely.')
+                else:
+                    data.remove(item)
+                    removed = True
+            elif count > 0: # Decrease the count of the item by the specified amount
+                newCount = max(0, itemCount - count)
+                item['count'] = newCount
+                if newCount == 0:
+                    data.remove(item)
+                    removed = True
+                else:
+                    print(f'Successfully removed {count} of that item.')
+            else: # set equal to 0
+                newCount = 0
+                item['count'] = newCount
+                removed = True
+
+    if removed:
+        print('Successfully removed item(s).')
+    else:
+        print('No matching item found or count is invalid.')
+
+    # Save the updated inventory data to the JSON file
+    saveToJson(data, INVENTORY_JSON)
 
 def enemiesMenuLogic(values):
     enemy = Enemy(values['-Enemy Name-'], values['-Enemy Desc-'])
@@ -283,7 +356,6 @@ def searchMenuInventoryLogic(values):
     else:
         print('Item not found in database')
 
-
 # all program logic
 def runApplication(window):
     while True:
@@ -319,13 +391,15 @@ def runApplication(window):
 
         # logic for each window: Inventory, Enemies
         if event == 'Enter' and CURRENT_WINDOW == 'Inventory':
-            invMenuLogic(values)
+            invMenuAddLogic(values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Enemies':
             enemiesMenuLogic(values)
         elif event == 'Roll' and CURRENT_WINDOW == 'Roller': #Large piece for rolling, took a lot more lines than I thought
             diceMenuLogic(window, values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Search':
             searchMenuInventoryLogic(values)
+        elif event == 'Remove':
+            invMenuRemoveLogic(values)
 
 
 window = makeMainMenuWindow() # create the first initial window
