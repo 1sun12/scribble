@@ -167,7 +167,7 @@ def loadJsonFile(fileName):
 
 # formats the inventory add/remove display
 def createLayoutMenu():
-    return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Search', ['Search']], ['Dice', ['Roller']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
+    return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Search', ['Search']], ['Character',['Equipment', 'Stats', 'Skills']],['Dice', ['Roller']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
 
 def createLayoutInv():
     return [[sg.Text('Add/Remove Item', font='_ 14')],
