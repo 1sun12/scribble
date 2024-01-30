@@ -186,7 +186,8 @@ def createLayoutEnemy():
 # formats the dice rolling display
 def createLayoutDice():
     return [[sg.Text('Dice Roller', font='_ 14', justification='center', expand_x=True)],
-            [sg.Text('# of Dice'), sg.Input(k ='-Dice Numbers-', do_not_clear=False, s=(10,1)), sg.Text('# of Sides'), sg.Input(k ='-Dice Sides-', do_not_clear=False, s=(10,1)), sg.Button('Roll')],
+            [sg.Text('# of Dice'), sg.Input(k ='-Dice Numbers-', do_not_clear=False, s=(10,1)),
+             sg.Text('# of Sides'), sg.Input(k ='-Dice Sides-', do_not_clear=False, s=(10,1)), sg.Button('Roll')],
             [sg.Text('Number Rolled - ') ,sg.Text(s=(20,1), key = '-Output-')]]
 
 def createLayoutSearch():
@@ -323,16 +324,20 @@ def enemiesMenuLogic(values):
         print("You are missing fields in enemy")
 
 def diceMenuLogic(window, values):
-    sides = int(values['-Dice Sides-'])
-    numOfDie = int(values['-Dice Numbers-'])
-    finalValue = 0
-    for x in range(0, numOfDie):
-        numberRolled = random.randrange(1, sides+1)
-        finalValue = finalValue + numberRolled
-    if numberRolled == sides and sides == 20:
-        window['-Output-'].update(str(finalValue) + ' - CRIT!')
+    if(str(values['-Dice Sides-']).isnumeric() == False or str(values['-Dice Numbers-']).isnumeric() == False):
+        print("Please enter Numbers.")
+        window['-Output-'].update(" ")
     else:
-        window['-Output-'].update(finalValue)
+        sides = int(values['-Dice Sides-'])
+        numOfDie = int(values['-Dice Numbers-'])
+        finalValue = 0
+        for x in range(0, numOfDie):
+            numberRolled = random.randrange(1, sides+1)
+            finalValue = finalValue + numberRolled
+        if numberRolled == sides and sides == 20:
+            window['-Output-'].update(str(finalValue) + ' - CRIT!')
+        else:
+            window['-Output-'].update(finalValue)
 
 def searchMenuInventoryLogic(values):
     input_value = values['-Search-'].lower()  # Convert input to lowercase
