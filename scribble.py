@@ -486,41 +486,41 @@ def runApplication(window):
         elif event == '--Lvl-':
             subStatsMenuLogic('-OutLvl-')
         if event == '-+Hp-':
-            addStatsMenuLogic('-OutLvl-')
+            addStatsMenuLogic('-OutHp-')
         elif event == '--Hp-':
-            subStatsMenuLogic('-OutLvl-')
+            subStatsMenuLogic('-OutHp-')
         elif event == '-+Ac-':
-            addStatsMenuLogic('-OutLvl-')
+            addStatsMenuLogic('-OutAc-')
         elif event == '--AC-':
-            subStatsMenuLogic('-OutLvl-')
+            subStatsMenuLogic('-OutAc-')
         elif event == '-+Spd-':
-            addStatsMenuLogic('-OutLvl-')
+            addStatsMenuLogic('-OutSpd-')
         elif event == '--Spd-':
-            subStatsMenuLogic('-OutLvl-')
+            subStatsMenuLogic('-OutSpd-')
         elif event == '-+Str-':
-            addStatsMenuLogic('-OutLvl-')
+            addStatsMenuLogic('-OutStr-')
         elif event == '--Str-':
-            subStatsMenuLogic('-OutLvl-')
+            subStatsMenuLogic('-OutStr-')
         elif event == '-+Dex-':
-            addStatsMenuLogic('-OutLvl-')
+            addStatsMenuLogic('-OutDex-')
         elif event == '--Dex-':
-            subStatsMenuLogic('-OutLvl-')
+            subStatsMenuLogic('-OutDex-')
         elif event == '-+Con-':
-            addStatsMenuLogic('-OutLvl-')
+            addStatsMenuLogic('-OutCon-')
         elif event == '--Con-':
-            subStatsMenuLogic('-OutLvl-')
+            subStatsMenuLogic('-OutCon-')
         elif event == '-+Int-':
-            addStatsMenuLogic('-OutLvl-')
+            addStatsMenuLogic('-OutInt-')
         elif event == '--Int-':
-            subStatsMenuLogic('-OutLvl-')
+            subStatsMenuLogic('-OutInt-')
         elif event == '-+Wis-':
-            addStatsMenuLogic('-OutLvl-')
+            addStatsMenuLogic('-OutWis-')
         elif event == '--Wis-':
-            subStatsMenuLogic('-OutLvl-')
+            subStatsMenuLogic('-OutWis-')
         elif event == '-+Cha-':
-            addStatsMenuLogic('-OutLvl-')
+            addStatsMenuLogic('-OutCha-')
         elif event == '--Cha-':
-            subStatsMenuLogic('-OutLvl-')
+            subStatsMenuLogic('-OutCha-')
 
 
 
