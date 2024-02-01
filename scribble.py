@@ -139,28 +139,26 @@ class Stats:
     
     # Sets for all the stats as well
     def setLvl(self, a):
-        return self.__lvl
+        self.__lvl = a
     def setHp(self, a):
-        return self.__hp
+        self.__hp = a
     def setAc(self, a):
-        return self.__ac
+        self.__ac = a
     def setSpd(self, a):
-        return self.__spd
+        self.__spd = a
     def setStr(self, a):
-        return self.__str
+        self.__str = a
     def setDex(self, a):
-        return self.__dex
+        self.__dex = a
     def setCon(self, a):
-        return self.__con
+        self.__con = a
     def setInt(self, a):
-        return self.__int
+        self.__int = a
     def setWis(self, a):
-        return self.__wis
+        self.__wis = a
     def setCha(self, a):
-        return self.__cha
+        self.__cha = a
     
-    
-
     # convert class data into dictionary and return
     def toDict(self):
         return {
@@ -466,7 +464,9 @@ def searchMenuInventoryLogic(values):
         print('Item not found in database')
 
 def addStatsMenuLogic(values):
-    stats = loadJsonFile(STATS_JSON)
+    if loadJsonFile(STATS_JSON) == FileNotFoundError:
+
+        stats = loadJsonFile(STATS_JSON)
 
 def subStatsMenuLogic(values):
     stats = loadJsonFile(STATS_JSON)
