@@ -167,7 +167,7 @@ def loadJsonFile(fileName):
 
 # formats the inventory add/remove display
 def createLayoutMenu():
-    return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Search', ['Search']], ['Dice', ['Roller']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
+    return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Search', ['Search']], ['Dice', ['Roller']], ['Settings', ['Edit Config']], ['Credits'], ['Quit', ['Quit']]])]]
 
 def createLayoutInv():
     return [[sg.Text('Add/Remove Item', font='_ 14')],
@@ -367,7 +367,7 @@ def runApplication(window):
         event, values = window.read() # when program is interacted with, capture that action as a variable
 
         # if 'X' button is pressed, close program and break from while loop
-        if event == sg.WIN_CLOSED:
+        if event == sg.WIN_CLOSED or event == 'Quit':
             break
 
         # if 'Inventory' is selected in the Menu
