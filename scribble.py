@@ -115,6 +115,52 @@ class Stats:
     def __init__(self, hp):
         self.__hp = hp
 
+    # Gets for all the stats
+    def getLvl(self):
+        return self.__lvl
+    def getHp(self):
+        return self.__hp
+    def getAc(self):
+        return self.__ac
+    def getSpd(self):
+        return self.__spd
+    def getStr(self):
+        return self.__str
+    def getDex(self):
+        return self.__dex
+    def getCon(self):
+        return self.__con
+    def getInt(self):
+        return self.__int
+    def getWis(self):
+        return self.__wis
+    def getCha(self):
+        return self.__cha
+    
+    # Sets for all the stats as well
+    def setLvl(self, a):
+        return self.__lvl
+    def setHp(self, a):
+        return self.__hp
+    def setAc(self, a):
+        return self.__ac
+    def setSpd(self, a):
+        return self.__spd
+    def setStr(self, a):
+        return self.__str
+    def setDex(self, a):
+        return self.__dex
+    def setCon(self, a):
+        return self.__con
+    def setInt(self, a):
+        return self.__int
+    def setWis(self, a):
+        return self.__wis
+    def setCha(self, a):
+        return self.__cha
+    
+    
+
     # convert class data into dictionary and return
     def toDict(self):
         return {
@@ -424,6 +470,7 @@ def addStatsMenuLogic(values):
 
 def subStatsMenuLogic(values):
     stats = loadJsonFile(STATS_JSON)
+
 
 # all program logic
 def runApplication(window):
