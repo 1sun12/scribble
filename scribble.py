@@ -466,6 +466,7 @@ def searchMenuInventoryLogic(values):
 def addStatsMenuLogic(values):
     if loadJsonFile(STATS_JSON) == FileNotFoundError:
 
+
         stats = loadJsonFile(STATS_JSON)
 
 def subStatsMenuLogic(values):
