@@ -115,7 +115,7 @@ class Stats:
     def __init__(self, hp):
         self.__hp = hp
 
-    # Gets for all the stats
+    # Getters for all the stats
     def getLvl(self):
         return self.__lvl
     def getHp(self):
@@ -137,7 +137,7 @@ class Stats:
     def getCha(self):
         return self.__cha
     
-    # Sets for all the stats as well
+    # Setters for all the stats as well
     def setLvl(self, a):
         self.__lvl = a
     def setHp(self, a):
