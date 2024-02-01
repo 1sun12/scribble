@@ -27,6 +27,7 @@ CONFIG = 'config.ini'
 INVENTORY_JSON = 'inventory.json'
 ENEMY_JSON = 'enemies.json'
 LOCATION_JSON = 'locations.json'
+STATS_JSON = 'stats.json'
 THEME = 'Topanga'
 CURRENT_WINDOW = None
 
@@ -100,7 +101,10 @@ class Item:
 
 # Stats - data container for statistical information about your character, enemies, allies
 class Stats:
+    __lvl = None
     __hp = None
+    __ac = None
+    __spd = None
     __str = None
     __dex = None
     __con = None
@@ -114,7 +118,10 @@ class Stats:
     # convert class data into dictionary and return
     def toDict(self):
         return {
+            'level': self.__lvl,
             'health': self.__hp,
+            'armor class': self.__ac,
+            'speed': self.__spd,
             'strength': self.__str,
             'dexterity': self.__dex,
             'constitution': self.__con,
@@ -167,7 +174,8 @@ def loadJsonFile(fileName):
 
 # formats the inventory add/remove display
 def createLayoutMenu():
-    return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Search', ['Search']], ['Character',['Equipment', 'Stats', 'Skills']],['Dice', ['Roller']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
+    return [[sg.Menu([['Add/Remove', ['Inventory', 'Enemies', 'Locations']], ['Search', ['Search']], ['Character',['Equipment', 'Stats', 'Skills']],
+                      ['Dice', ['Roller']], ['Settings', ['Edit Config']], ['Credits'], ['Quit']])]]
 
 def createLayoutInv():
     return [[sg.Text('Add/Remove Item', font='_ 14')],
@@ -191,7 +199,7 @@ def createLayoutDice():
             [sg.Text('Number Rolled - ') ,sg.Text(s=(20,1), key = '-Output-')]]
 
 def createLayoutSearch():
-    return [[sg.Text('Search Database', font='_ 14', justification='center', expand_x=True)],
+    return [[sg.Text('Search Database', font='_ 43', justification='center', expand_x=True)],
             [sg.Text('Name:'), sg.Input(k='-Search-', do_not_clear=False, s=(20, 1))],
             [sg.Output(s=(75,13))]]
 
@@ -203,6 +211,46 @@ def createLayoutInvButtons():
     return [[sg.Button('Enter'), sg.Button('Remove')],
             [sg.Text('- Enter: Type JUST name and count to add more of this item to inv.')],
             [sg.Text('- Remove: Type JUST name and count, # for that amount, 0 to set 0, or -1 to completely remove')]]
+
+def createLayoutStats1():
+    layout_1 = [[sg.Text('Level', s=(10,1), font='_ 14')],
+                [sg.Text('HP', s=(10,1), font='_ 14')],
+                [sg.Text('Armor Class', s=(10,1), font='_ 14')],
+                [sg.Text('Speed', s=(10,1), font='_ 14')],
+                [sg.Text('Strength', s=(10,1), font='_ 14')],
+                [sg.Text('Dexterity', s=(10,1), font='_ 14')],
+                [sg.Text('Constitution', s=(10,1), font='_ 14')],
+                [sg.Text('Intelligence', s=(10,1), font='_ 14')],
+                [sg.Text('Wisdom', s=(10,1), font='_ 14')],
+                [sg.Text('Charisma', s=(10,1), font='_ 14')]]
+    
+    layout_2 = [[sg.Text(key='-OutLvl-', s=(10,1), font='_ 14')],
+                [sg.Text(key='-OutHP-', s=(10,1), font='_ 14')],
+                [sg.Text(key='-OutAc-', s=(10,1), font='_ 14')],
+                [sg.Text(key='-OutSpd-', s=(10,1), font='_ 14')],
+                [sg.Text(key='-OutStr-', s=(10,1), font='_ 14')],
+                [sg.Text(key='-OutDex-', s=(10,1), font='_ 14')],
+                [sg.Text(key='-OutCon-', s=(10,1), font='_ 14')],
+                [sg.Text(key='-OutInt-', s=(10,1), font='_ 14')],
+                [sg.Text(key='-OutWis-', s=(10,1), font='_ 14')],
+                [sg.Text(key='-OutCha-', s=(10,1), font='_ 14')]]
+    
+    layout_3 = [[sg.Button('+', k= '-+Lvl-'), sg.Button('-',k= '--Lvl-')],
+                [sg.Button('+', k= '-+Hp-'), sg.Button('-',k= '--Hp-')],
+                [sg.Button('+', k= '-+Ac-'), sg.Button('-',k= '--Ac-')],
+                [sg.Button('+', k= '-+Spd-'), sg.Button('-',k= '--Spd-')],
+                [sg.Button('+', k= '-+Str-'), sg.Button('-',k= '--Str-')],
+                [sg.Button('+', k= '-+Dex-'), sg.Button('-',k= '--Dex-')],
+                [sg.Button('+', k= '-+Con-'), sg.Button('-',k= '--Con-')],
+                [sg.Button('+', k= '-+Int-'), sg.Button('-',k= '--Int-')],
+                [sg.Button('+', k= '-+Wis-'), sg.Button('-',k= '--Wis-')],
+                [sg.Button('+', k= '-+Cha-'), sg.Button('-',k= '--Cha-')]]
+    
+    return [[[sg.T('Stats', font='_ 16', justification='center', expand_x=True)]],
+            [sg.Col(layout_1,p=0), sg.Col(layout_2,p=0), sg.Col(layout_3,p=0)]]
+
+def createLayoutSkills():
+    return [[sg.T('Skills', font='_ 14', justification='center', expand_x=True)]]
 
 # return the created mainMenu window
 def makeMainMenuWindow():
@@ -232,6 +280,16 @@ def makeSearchWindow():
     layout_final = [[createLayoutMenu()],
                     [createLayoutSearch()],
                     [createLayoutButtons()]]
+    return sg.Window('Scribble', layout_final, size=(800,400))
+
+def makeStatsWindow():
+    layout_final = [[createLayoutMenu()],
+                    [createLayoutStats1()]]
+    return sg.Window('Scribble', layout_final, size=(800,400))
+
+def makeSkillsWindow():
+    layout_final = [[createLayoutMenu()],
+                    [createLayoutSkills()]]
     return sg.Window('Scribble', layout_final, size=(800,400))
 
 def search(find):
@@ -361,6 +419,12 @@ def searchMenuInventoryLogic(values):
     else:
         print('Item not found in database')
 
+def addStatsMenuLogic(values):
+    stats = loadJsonFile(STATS_JSON)
+
+def subStatsMenuLogic(values):
+    stats = loadJsonFile(STATS_JSON)
+
 # all program logic
 def runApplication(window):
     while True:
@@ -393,18 +457,71 @@ def runApplication(window):
             window.close()
             window = makeSearchWindow()
             CURRENT_WINDOW = 'Search'
+        
+        if event == 'Stats':
+            window.close()
+            window = makeStatsWindow()
+            CURRENT_WINDOW = 'Stats'
+
+        if event == 'Skills':
+            window.close()
+            window = makeSkillsWindow()
+            CURRENT_WINDOW = 'Skills'
 
         # logic for each window: Inventory, Enemies
         if event == 'Enter' and CURRENT_WINDOW == 'Inventory':
             invMenuAddLogic(values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Enemies':
             enemiesMenuLogic(values)
-        elif event == 'Roll' and CURRENT_WINDOW == 'Roller': #Large piece for rolling, took a lot more lines than I thought
+        elif event == 'Roll' and CURRENT_WINDOW == 'Roller':
             diceMenuLogic(window, values)
         elif event == 'Enter' and CURRENT_WINDOW == 'Search':
             searchMenuInventoryLogic(values)
         elif event == 'Remove':
             invMenuRemoveLogic(values)
+        
+        # Insane event list for skills logic (Talk to Regan about a better solution to this)
+        if event == '-+Lvl-':
+            addStatsMenuLogic('-OutLvl-')
+        elif event == '--Lvl-':
+            subStatsMenuLogic('-OutLvl-')
+        if event == '-+Hp-':
+            addStatsMenuLogic('-OutLvl-')
+        elif event == '--Hp-':
+            subStatsMenuLogic('-OutLvl-')
+        elif event == '-+Ac-':
+            addStatsMenuLogic('-OutLvl-')
+        elif event == '--AC-':
+            subStatsMenuLogic('-OutLvl-')
+        elif event == '-+Spd-':
+            addStatsMenuLogic('-OutLvl-')
+        elif event == '--Spd-':
+            subStatsMenuLogic('-OutLvl-')
+        elif event == '-+Str-':
+            addStatsMenuLogic('-OutLvl-')
+        elif event == '--Str-':
+            subStatsMenuLogic('-OutLvl-')
+        elif event == '-+Dex-':
+            addStatsMenuLogic('-OutLvl-')
+        elif event == '--Dex-':
+            subStatsMenuLogic('-OutLvl-')
+        elif event == '-+Con-':
+            addStatsMenuLogic('-OutLvl-')
+        elif event == '--Con-':
+            subStatsMenuLogic('-OutLvl-')
+        elif event == '-+Int-':
+            addStatsMenuLogic('-OutLvl-')
+        elif event == '--Int-':
+            subStatsMenuLogic('-OutLvl-')
+        elif event == '-+Wis-':
+            addStatsMenuLogic('-OutLvl-')
+        elif event == '--Wis-':
+            subStatsMenuLogic('-OutLvl-')
+        elif event == '-+Cha-':
+            addStatsMenuLogic('-OutLvl-')
+        elif event == '--Cha-':
+            subStatsMenuLogic('-OutLvl-')
+
 
 
 window = makeMainMenuWindow() # create the first initial window
